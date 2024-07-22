@@ -79,9 +79,8 @@ sequenceDiagram
 
 ```
 curl --request DELETE \
-  --url http://localhost:8000/123 \
+  --url http://localhost:8000/:memberId \
   --header 'Authorization: Bearer XXX' \
-  --header 'Content-Type: application/json' \
 ```
 
 ```mermaid
