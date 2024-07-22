@@ -60,9 +60,6 @@ const handlerPost = async (request: Request, kv: Deno.Kv) => {
     }),
   ];
 
-  console.log(normalizedBodyEmail);
-  console.log(Deno.env.get("ADMIN_RECIPIENTS")?.split(",")!);
-
   const [emailUserResponse, emailAdminResponse] = await Promise.all([
     resend.emails.send({
       from: "NN1 Dev Club <club@nn1.dev>",
