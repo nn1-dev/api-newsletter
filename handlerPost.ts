@@ -1,11 +1,11 @@
-import { Resend } from "npm:resend";
+// import { Resend } from "npm:resend";
 import { PREFIX } from "./constants.ts";
-import { renderEmailAdminNewsletterSubscribe } from "./emails/admin-newsletter-subscribe.tsx";
-import { renderEmailNewsletterThanks } from "./emails/newsletter-thanks.tsx";
+// import { renderEmailAdminNewsletterSubscribe } from "./emails/admin-newsletter-subscribe.tsx";
+// import { renderEmailNewsletterThanks } from "./emails/newsletter-thanks.tsx";
 import { ulid } from "https://deno.land/x/ulid@v0.3.0/mod.ts";
 import { normalizeEmail } from "./utils.ts";
 
-const resend = new Resend(Deno.env.get("API_KEY_RESEND"));
+// const resend = new Resend(Deno.env.get("API_KEY_RESEND"));
 
 const handlerPost = async (request: Request, kv: Deno.Kv) => {
   const body: {
@@ -40,54 +40,54 @@ const handlerPost = async (request: Request, kv: Deno.Kv) => {
 
   await kv.set([PREFIX, ulid()], data);
 
-  const newEntriesIterator = kv.list<{
-    timestamp: string;
-    email: string;
-  }>({
-    prefix: [PREFIX],
-  });
-  const newEntries = await Array.fromAsync(newEntriesIterator);
-  const newEntry = newEntries.find(
-    (e) => e.value.email === normalizedBodyEmail,
-  );
+  // const newEntriesIterator = kv.list<{
+  //   timestamp: string;
+  //   email: string;
+  // }>({
+  //   prefix: [PREFIX],
+  // });
+  // const newEntries = await Array.fromAsync(newEntriesIterator);
+  // const newEntry = newEntries.find(
+  //   (e) => e.value.email === normalizedBodyEmail,
+  // );
 
-  const [emailUser, emailAdmin] = [
-    renderEmailNewsletterThanks({
-      unsubscribeUrl: `https://nn1.dev/newsletter/unsubscribe/${newEntry?.key[1].toString()}`,
-    }),
-    renderEmailAdminNewsletterSubscribe({
-      email: normalizedBodyEmail,
-    }),
-  ];
+  // const [emailUser, emailAdmin] = [
+  //   renderEmailNewsletterThanks({
+  //     unsubscribeUrl: `https://nn1.dev/newsletter/unsubscribe/${newEntry?.key[1].toString()}`,
+  //   }),
+  //   renderEmailAdminNewsletterSubscribe({
+  //     email: normalizedBodyEmail,
+  //   }),
+  // ];
 
-  const [emailUserResponse, emailAdminResponse] = await Promise.all([
-    resend.emails.send({
-      from: "NN1 Dev Club <club@nn1.dev>",
-      to: normalizedBodyEmail,
-      subject: "✨ Newsletter",
-      html: emailUser.html,
-      text: emailUser.text,
-    }),
-    resend.emails.send({
-      from: "NN1 Dev Club <club@nn1.dev>",
-      to: Deno.env.get("ADMIN_RECIPIENTS")?.split(",")!,
-      subject: "✨ Newsletter - user subscribed",
-      html: emailAdmin.html,
-      text: emailAdmin.text,
-    }),
-  ]);
+  // const [emailUserResponse, emailAdminResponse] = await Promise.all([
+  //   resend.emails.send({
+  //     from: "NN1 Dev Club <club@nn1.dev>",
+  //     to: normalizedBodyEmail,
+  //     subject: "✨ Newsletter",
+  //     html: emailUser.html,
+  //     text: emailUser.text,
+  //   }),
+  //   resend.emails.send({
+  //     from: "NN1 Dev Club <club@nn1.dev>",
+  //     to: Deno.env.get("ADMIN_RECIPIENTS")?.split(",")!,
+  //     subject: "✨ Newsletter - user subscribed",
+  //     html: emailAdmin.html,
+  //     text: emailAdmin.text,
+  //   }),
+  // ]);
 
-  if (emailUserResponse.error || emailAdminResponse.error) {
-    return Response.json(
-      {
-        status: "error",
-        statusCode: 400,
-        data: null,
-        error: emailUserResponse.error || emailAdminResponse.error,
-      },
-      { status: 400 },
-    );
-  }
+  // if (emailUserResponse.error || emailAdminResponse.error) {
+  //   return Response.json(
+  //     {
+  //       status: "error",
+  //       statusCode: 400,
+  //       data: null,
+  //       error: emailUserResponse.error || emailAdminResponse.error,
+  //     },
+  //     { status: 400 },
+  //   );
+  // }
 
   return Response.json(
     {
