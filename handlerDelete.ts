@@ -1,4 +1,8 @@
+import { Resend } from "npm:resend";
 import { PREFIX } from "./constants.ts";
+import { renderEmailAdminNewsletterUnsubscribe } from "./emails/admin-newsletter-unsubscribe.tsx";
+
+const resend = new Resend(Deno.env.get("API_KEY_RESEND"));
 
 const handlerDelete = async (request: Request, kv: Deno.Kv) => {
   const pattern = new URLPattern({
@@ -10,7 +14,7 @@ const handlerDelete = async (request: Request, kv: Deno.Kv) => {
   if (!memberId) {
     return Response.json(
       {
-        status: "success",
+        status: "error",
         statusCode: 400,
         data: null,
         error: "Invalid request.",
@@ -19,7 +23,37 @@ const handlerDelete = async (request: Request, kv: Deno.Kv) => {
     );
   }
 
-  await kv.delete([PREFIX, memberId]);
+  const entry = await kv.get<{
+    timestamp: string;
+    email: string;
+  }>([PREFIX, memberId]);
+
+  if (!entry.value) {
+    return Response.json(
+      {
+        status: "error",
+        statusCode: 400,
+        data: null,
+        error: "Invalid request.",
+      },
+      { status: 400 },
+    );
+  }
+
+  const emailAdmin = renderEmailAdminNewsletterUnsubscribe({
+    email: entry.value.email,
+  });
+
+  await Promise.all([
+    kv.delete([PREFIX, memberId]),
+    resend.emails.send({
+      from: "NN1 Dev Club <club@nn1.dev>",
+      to: Deno.env.get("ADMIN_RECIPIENTS")?.split(",")!,
+      subject: "✨ Newsletter - user unsubscribed",
+      html: emailAdmin.html,
+      text: emailAdmin.text,
+    }),
+  ]);
 
   return Response.json(
     {
