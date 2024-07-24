@@ -18,6 +18,13 @@ const style = {
     fontSize: "16px",
     lineHeight: "28px",
   },
+  heading: {
+    color: "#f8f7ff",
+    margin: "0 0 28px",
+    fontSize: "16px",
+    lineHeight: "28px",
+    fontWeight: "700",
+  },
   hr: {
     borderColor: "#29282e",
     margin: "0 0 28px",

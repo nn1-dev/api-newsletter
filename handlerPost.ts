@@ -2,12 +2,73 @@ import { Resend } from "npm:resend";
 import { PREFIX } from "./constants.ts";
 import { renderEmailAdminNewsletterSubscribe } from "./emails/admin-newsletter-subscribe.tsx";
 import { renderEmailNewsletterThanks } from "./emails/newsletter-thanks.tsx";
+import { renderEmail_2024_07_24 } from "./emails/newsletter-2024-07-24.tsx";
 import { ulid } from "https://deno.land/x/ulid@v0.3.0/mod.ts";
 import { normalizeEmail } from "./utils.ts";
 
 const resend = new Resend(Deno.env.get("API_KEY_RESEND"));
 
 const handlerPost = async (request: Request, kv: Deno.Kv) => {
+  if (request.url.includes("broadcast")) {
+    const body: {
+      template: string;
+      subject: string;
+    } = await request.json();
+
+    const templateMapper = {
+      "2024-07-24": renderEmail_2024_07_24,
+    };
+
+    if (!Object.keys(templateMapper).includes(body.template)) {
+      return Response.json(
+        {
+          status: "error",
+          statusCode: 400,
+          data: null,
+          error: "Template is not configured",
+        },
+        { status: 400 },
+      );
+    }
+    const template =
+      templateMapper[body.template as keyof typeof templateMapper];
+
+    const entriesIterator = kv.list<{
+      timestamp: string;
+      email: string;
+    }>({
+      prefix: [PREFIX],
+    });
+    const entries = await Array.fromAsync(entriesIterator);
+
+    for (const entry of entries) {
+      const email = template({
+        unsubscribeUrl: `https://nn1.dev/newsletter/unsubscribe/${entry?.key[1].toString()}`,
+      });
+      const { error } = await resend.emails.send({
+        from: "NN1 Dev Club <club@nn1.dev>",
+        to: entry.value.email,
+        subject: body.subject,
+        html: email.html,
+        text: email.text,
+      });
+
+      error
+        ? console.error(error)
+        : console.log(`Email successfully sent to ${entry.value.email}`);
+    }
+
+    return Response.json(
+      {
+        status: "success",
+        statusCode: 200,
+        data: "Broadcast successful",
+        error: null,
+      },
+      { status: 200 },
+    );
+  }
+
   const body: {
     email: string;
   } = await request.json();
