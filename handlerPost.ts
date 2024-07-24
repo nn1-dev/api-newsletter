@@ -8,67 +8,76 @@ import { normalizeEmail } from "./utils.ts";
 
 const resend = new Resend(Deno.env.get("API_KEY_RESEND"));
 
+const TEMPLATE_MAPPER = {
+  "2024-07-24": renderEmail_2024_07_24,
+};
+
 const handlerPost = async (request: Request, kv: Deno.Kv) => {
-  if (request.url.includes("broadcast")) {
-    const body: {
-      template: string;
-      subject: string;
-    } = await request.json();
+  const patternBroadcast = new URLPattern({ pathname: "/broadcast" });
+  const patternBroadcastMatch = patternBroadcast.test(request.url);
 
-    const templateMapper = {
-      "2024-07-24": renderEmail_2024_07_24,
-    };
+  return patternBroadcastMatch
+    ? await handlerPostBroadcast(request, kv)
+    : await handlerPostNewEntry(request, kv);
+};
 
-    if (!Object.keys(templateMapper).includes(body.template)) {
-      return Response.json(
-        {
-          status: "error",
-          statusCode: 400,
-          data: null,
-          error: "Template is not configured",
-        },
-        { status: 400 },
-      );
-    }
-    const template =
-      templateMapper[body.template as keyof typeof templateMapper];
+const handlerPostBroadcast = async (request: Request, kv: Deno.Kv) => {
+  const body: {
+    template: string;
+    subject: string;
+  } = await request.json();
 
-    const entriesIterator = kv.list<{
-      timestamp: string;
-      email: string;
-    }>({
-      prefix: [PREFIX],
-    });
-    const entries = await Array.fromAsync(entriesIterator);
-
-    for (const entry of entries) {
-      const email = template({
-        unsubscribeUrl: `https://nn1.dev/newsletter/unsubscribe/${entry?.key[1].toString()}`,
-      });
-      const { error } = await resend.emails.send({
-        from: "NN1 Dev Club <club@nn1.dev>",
-        to: entry.value.email,
-        subject: body.subject,
-        html: email.html,
-        text: email.text,
-      });
-
-      error
-        ? console.error(error)
-        : console.log(`Email successfully sent to ${entry.value.email}`);
-    }
-
+  if (!Object.keys(TEMPLATE_MAPPER).includes(body.template)) {
     return Response.json(
       {
-        status: "success",
-        statusCode: 200,
-        data: "Broadcast successful",
-        error: null,
+        status: "error",
+        statusCode: 400,
+        data: null,
+        error: "Template is not configured",
       },
-      { status: 200 },
+      { status: 400 },
     );
   }
+  const template =
+    TEMPLATE_MAPPER[body.template as keyof typeof TEMPLATE_MAPPER];
 
+  const entriesIterator = kv.list<{
+    timestamp: string;
+    email: string;
+  }>({
+    prefix: [PREFIX],
+  });
+  const entries = await Array.fromAsync(entriesIterator);
+
+  for (const entry of entries) {
+    const email = template({
+      unsubscribeUrl: `https://nn1.dev/newsletter/unsubscribe/${entry?.key[1].toString()}`,
+    });
+    const { error } = await resend.emails.send({
+      from: "NN1 Dev Club <club@nn1.dev>",
+      to: entry.value.email,
+      subject: body.subject,
+      html: email.html,
+      text: email.text,
+    });
+
+    error
+      ? console.error(error)
+      : console.log(`Email successfully sent to ${entry.value.email}`);
+  }
+
+  return Response.json(
+    {
+      status: "success",
+      statusCode: 200,
+      data: "Broadcast successful",
+      error: null,
+    },
+    { status: 200 },
+  );
+};
+
+const handlerPostNewEntry = async (request: Request, kv: Deno.Kv) => {
   const body: {
     email: string;
   } = await request.json();
@@ -99,22 +108,12 @@ const handlerPost = async (request: Request, kv: Deno.Kv) => {
     email: normalizedBodyEmail,
   };
 
-  await kv.set([PREFIX, ulid()], data);
-
-  const newEntriesIterator = kv.list<{
-    timestamp: string;
-    email: string;
-  }>({
-    prefix: [PREFIX],
-  });
-  const newEntries = await Array.fromAsync(newEntriesIterator);
-  const newEntry = newEntries.find(
-    (e) => e.value.email === normalizedBodyEmail,
-  );
+  const memberId = ulid();
+  await kv.set([PREFIX, memberId], data);
 
   const [emailUser, emailAdmin] = [
     renderEmailNewsletterThanks({
-      unsubscribeUrl: `https://nn1.dev/newsletter/unsubscribe/${newEntry?.key[1].toString()}`,
+      unsubscribeUrl: `https://nn1.dev/newsletter/unsubscribe/${memberId}`,
     }),
     renderEmailAdminNewsletterSubscribe({
       email: normalizedBodyEmail,
