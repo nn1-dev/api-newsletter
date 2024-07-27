@@ -1,8 +1,8 @@
 import { Resend } from "npm:resend";
 import { PREFIX } from "./constants.ts";
-import { renderEmailAdminNewsletterSubscribe } from "./emails/admin-newsletter-subscribe.tsx";
-import { renderEmailNewsletterThanks } from "./emails/newsletter-thanks.tsx";
-import { renderEmail_2024_07_24 } from "./emails/newsletter-2024-07-24.tsx";
+import { renderEmailAdminNewsletterSubscribe } from "https://github.com/nn1-dev/emails/raw/main/emails/admin-newsletter-subscribe.tsx";
+import { renderEmailNewsletterThanks } from "https://github.com/nn1-dev/emails/raw/main/emails/newsletter-thanks.tsx";
+import { renderEmail_2024_07_24 } from "https://github.com/nn1-dev/emails/raw/main/emails/newsletter-2024-07-24.tsx";
 import { ulid } from "https://deno.land/x/ulid@v0.3.0/mod.ts";
 import { normalizeEmail } from "./utils.ts";
 
