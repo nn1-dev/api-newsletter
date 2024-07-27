@@ -1,6 +1,6 @@
 import { Resend } from "npm:resend";
 import { PREFIX } from "./constants.ts";
-import { renderEmailAdminNewsletterUnsubscribe } from "https://github.com/nn1-dev/emails/raw/main/emails/admin-newsletter-unsubscribe.tsx";
+import { renderEmailAdminNewsletterUnsubscribe } from "https://raw.githubusercontent.com/nn1-dev/emails/main/emails/admin-newsletter-unsubscribe.tsx";
 
 const resend = new Resend(Deno.env.get("API_KEY_RESEND"));
 
