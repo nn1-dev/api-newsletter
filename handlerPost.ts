@@ -1,7 +1,6 @@
 import { Resend } from "npm:resend";
 import { PREFIX } from "./constants.ts";
 import { renderEmailAdminNewsletterSubscribe } from "https://raw.githubusercontent.com/nn1-dev/emails/main/emails/admin-newsletter-subscribe.tsx";
-import { renderEmailNewsletterThanks } from "https://raw.githubusercontent.com/nn1-dev/emails/main/emails/newsletter-thanks.tsx";
 import { renderEmail_2024_07_24 } from "https://raw.githubusercontent.com/nn1-dev/emails/main/emails/newsletter-2024-07-24.tsx";
 import { ulid } from "https://deno.land/x/ulid@v0.3.0/mod.ts";
 import { normalizeEmail } from "./utils.ts";
@@ -111,39 +110,24 @@ const handlerPostNewEntry = async (request: Request, kv: Deno.Kv) => {
   const memberId = ulid();
   await kv.set([PREFIX, memberId], data);
 
-  const [emailUser, emailAdmin] = [
-    renderEmailNewsletterThanks({
-      unsubscribeUrl: `https://nn1.dev/newsletter/unsubscribe/${memberId}`,
-    }),
-    renderEmailAdminNewsletterSubscribe({
-      email: normalizedBodyEmail,
-    }),
-  ];
+  const emailAdmin = renderEmailAdminNewsletterSubscribe({
+    email: normalizedBodyEmail,
+  });
+  const { error } = await resend.emails.send({
+    from: "NN1 Dev Club <club@nn1.dev>",
+    to: Deno.env.get("ADMIN_RECIPIENTS")?.split(",")!,
+    subject: "✨ Newsletter - user subscribed",
+    html: emailAdmin.html,
+    text: emailAdmin.text,
+  });
 
-  const [emailUserResponse, emailAdminResponse] = await Promise.all([
-    resend.emails.send({
-      from: "NN1 Dev Club <club@nn1.dev>",
-      to: normalizedBodyEmail,
-      subject: "✨ Newsletter",
-      html: emailUser.html,
-      text: emailUser.text,
-    }),
-    resend.emails.send({
-      from: "NN1 Dev Club <club@nn1.dev>",
-      to: Deno.env.get("ADMIN_RECIPIENTS")?.split(",")!,
-      subject: "✨ Newsletter - user subscribed",
-      html: emailAdmin.html,
-      text: emailAdmin.text,
-    }),
-  ]);
-
-  if (emailUserResponse.error || emailAdminResponse.error) {
+  if (error) {
     return Response.json(
       {
         status: "error",
         statusCode: 400,
         data: null,
-        error: emailUserResponse.error || emailAdminResponse.error,
+        error: error,
       },
       { status: 400 },
     );
