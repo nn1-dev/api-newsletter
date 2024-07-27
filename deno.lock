@@ -501,6 +501,7 @@
     "https://esm.sh/react/jsx-runtime": "https://esm.sh/react@18.3.1/jsx-runtime",
     "https://esm.sh/v128/@types/react@~18.3/jsx-runtime~.d.ts": "https://esm.sh/v128/@types/react@18.2.38/jsx-runtime~.d.ts",
     "https://github.com/nn1-dev/emails/raw/main/emails/admin-newsletter-subscribe.tsx": "https://raw.githubusercontent.com/nn1-dev/emails/main/emails/admin-newsletter-subscribe.tsx",
+    "https://github.com/nn1-dev/emails/raw/main/emails/admin-newsletter-unsubscribe.tsx": "https://raw.githubusercontent.com/nn1-dev/emails/main/emails/admin-newsletter-unsubscribe.tsx",
     "https://github.com/nn1-dev/emails/raw/main/emails/newsletter-2024-07-24.tsx": "https://raw.githubusercontent.com/nn1-dev/emails/main/emails/newsletter-2024-07-24.tsx",
     "https://github.com/nn1-dev/emails/raw/main/emails/newsletter-thanks.tsx": "https://raw.githubusercontent.com/nn1-dev/emails/main/emails/newsletter-thanks.tsx"
   },
@@ -513,6 +514,7 @@
     "https://esm.sh/stable/react@18.3.1/denonext/jsx-runtime.js": "5ff1e02a3bb5c69dd3535d77054b182f1ea51c5eeaf24a396984f6b7012c2716",
     "https://esm.sh/stable/react@18.3.1/denonext/react.mjs": "fc048ffc55366baf7669519127d186761db72046e2bebf35fe8d0de3964defa3",
     "https://raw.githubusercontent.com/nn1-dev/emails/main/emails/admin-newsletter-subscribe.tsx": "0e1cc5483d50412945748df6ba96a988b3eb5f61e97632e15e6853d2696b3f3d",
+    "https://raw.githubusercontent.com/nn1-dev/emails/main/emails/admin-newsletter-unsubscribe.tsx": "d77a2b8bd224b981d2088c5eb105a1a010eccf26fe4bd8974cf1da0c6f0758e2",
     "https://raw.githubusercontent.com/nn1-dev/emails/main/emails/newsletter-2024-07-24.tsx": "390d81068c560580c63b78a385027e0c7f5dba0acf354896c25d2d1353c5a3c7",
     "https://raw.githubusercontent.com/nn1-dev/emails/main/emails/newsletter-thanks.tsx": "e75600164023ec0d4985c60a46e02a5e48fe2355040814c00604207e52980af3",
     "https://raw.githubusercontent.com/nn1-dev/emails/main/style.tsx": "8d8a8080ca57d4d1896e9d530104b2e1dce18cca92380026bf70c9eab3b0e713"
