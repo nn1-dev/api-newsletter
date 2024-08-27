@@ -40,7 +40,7 @@ const handlerDelete = async (request: Request, kv: Deno.Kv) => {
     );
   }
 
-  const emailAdmin = renderEmailAdminNewsletterUnsubscribe({
+  const emailAdmin = await renderEmailAdminNewsletterUnsubscribe({
     email: entry.value.email,
   });
 

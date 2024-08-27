@@ -40,7 +40,7 @@ const handlerPost = async (request: Request, kv: Deno.Kv) => {
   const memberId = ulid();
   await kv.set([PREFIX, memberId], data);
 
-  const emailAdmin = renderEmailAdminNewsletterSubscribe({
+  const emailAdmin = await renderEmailAdminNewsletterSubscribe({
     email: normalizedBodyEmail,
   });
   const { error } = await resend.emails.send({
