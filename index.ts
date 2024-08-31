@@ -1,6 +1,12 @@
+import * as Sentry from "https://deno.land/x/sentry@8.27.0/index.mjs";
 import handlerDelete from "./handlerDelete.ts";
 import handlerPost from "./handlerPost.ts";
 import handlerGet from "./handlerGet.ts";
+
+Sentry.init({
+  dsn: Deno.env.get("SENTRY_DSN"),
+  tracesSampleRate: 1.0,
+});
 
 const kv = await Deno.openKv();
 
