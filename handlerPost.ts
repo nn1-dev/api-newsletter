@@ -37,9 +37,8 @@ const handlerPost = async (request: Request, kv: Deno.Kv) => {
     email: normalizedBodyEmail,
   };
 
-  // const memberId = ulid();
-  // await kv.set([PREFIX, memberId], data);
-  console.log({ normalizedBodyEmail });
+  const memberId = ulid();
+  await kv.set([PREFIX, memberId], data);
 
   const emailAdmin = await renderEmailAdminNewsletterSubscribe({
     email: normalizedBodyEmail,
